@@ -49,13 +49,20 @@ def index():
 
             enctex_internal = fernet.encrypt(str(uuid_internal).encode())
             enctex_external = fernet.encrypt(str(dict_serializer).encode())
-            
-            img_internal = qrcode.make(enctex_internal)
-            img_external = qrcode.make(enctex_external)
-        
+
+            qr1 = qrcode.QRCode(box_size=5, border=1)
+            qr1.add_data(enctex_internal)
+
+            qr2 = qrcode.QRCode(box_size=1, border=1)
+            qr2.add_data(enctex_external)
+
+            qr1_image = qr1.make_image()
+            qr2_image = qr2.make_image()
+
             path_to_download_folder = str(os.path.join(Path.home(), "Downloads"))
-            img_internal.save(f'{path_to_download_folder}/{uuid_internal}__{i}')
-            img_external.save(f'{path_to_download_folder}/{uuid_external}__{i}')
+
+            qr1_image.save(f'{path_to_download_folder}/{uuid_internal}__{i}')
+            qr2_image.save(f'{path_to_download_folder}/{uuid_external}__{i}')                
 
             counter = 0
 
@@ -92,7 +99,7 @@ def add():
     cursor.execute(''' UPDATE identificadores SET counter = %s WHERE internal_qr=%s AND external_qr=%s''',(counter, internal_qr,external_qr))
     cursor.execute(''' SELECT id, counter FROM identificadores WHERE internal_qr=%s AND external_qr=%s''',(internal_qr,external_qr))
     results = cursor.fetchall()
-    
+
     mysql.connection.commit()
     cursor.close()
 
