@@ -1,31 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="card card-container">
     <h1>{% block title %} Creación de códigos QR {% endblock %}</h1>
     <form method="post">
         <label for="batch">Lote</label>
-        <br>
-        <input type="text" name="batch"
-               placeholder="Número de lote"
-               value="{{ request.form['batch'] }}"></input>
+        <input 
+            class="form-control"
+            type="text" name="batch"
+            placeholder="Número de lote"
+            value="{{ request.form['batch'] }}"></input>
         <br>
 
         <label for="amount">Cantidad</label>
-        <br>
-        <input type="text" name="amount"
-               placeholder="Cantidad de etiquetas a realizar"
-               value="{{ request.form['amount'] }}"></input>
+        <input 
+            class="form-control"
+            type="text" name="amount"
+            placeholder="Cantidad de etiquetas a realizar"
+            value="{{ request.form['amount'] }}"></input>
         <br>
 
         <label for="dueDate">Fecha de vencimiento</label>
-        <br>
-        <input type="text" name="dueDate"
-               placeholder="AAAA-MM-DD"
-               value="{{ request.form['dueDate'] }}"></input>
+        <input 
+            class="form-control"
+            type="text" name="dueDate"
+            placeholder="AAAA-MM-DD"
+            value="{{ request.form['dueDate'] }}"></input>
         <br>
 
         <br>
-        <button type="submit">Generar QRs</button>
+        <button class="btn btn-primary btn-block" type="submit">Generar QRs</button>
     </form>
-
+</div>
 {% endblock %}
