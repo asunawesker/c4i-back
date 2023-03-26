@@ -57,7 +57,9 @@ def index():
             img_internal.save(f'{path_to_download_folder}/{uuid_internal}__{i}')
             img_external.save(f'{path_to_download_folder}/{uuid_external}__{i}')
 
-            cursor.execute(''' INSERT INTO identificadores (internal_qr, external_qr, hash) VALUES(%s,%s,%s)''',(enctex_internal,enctex_external, hash_value))
+            counter = 0
+
+            cursor.execute(''' INSERT INTO identificadores (internal_qr, external_qr, hash, counter) VALUES(%s,%s,%s,%s)''',(enctex_internal,enctex_external, hash_value, counter))
         
         mysql.connection.commit()
         cursor.close()
@@ -73,7 +75,7 @@ def index():
                 my_zip.write(f'{path_to_download_folder}/{file}')
                 os.remove(f'{path_to_download_folder}/{file}')
         
-        return render_template('index.html')
+    return render_template('index.html')
 
 
 @app.route('/qrs', methods=['POST'])                                                                                                    
@@ -83,15 +85,24 @@ def add():
     external_qr = request.json["external_qr"]
 
     cursor = mysql.connection.cursor()
-    result = cursor.execute(''' SELECT id FROM identificadores WHERE internal_qr=%s AND external_qr=%s''',(internal_qr,external_qr))
+    cursor.execute(''' SELECT id, counter FROM identificadores WHERE internal_qr=%s AND external_qr=%s''',(internal_qr,external_qr))
+    results = cursor.fetchall()
+
+    counter = int(results[0][1]) + 1
+    cursor.execute(''' UPDATE identificadores SET counter = %s WHERE internal_qr=%s AND external_qr=%s''',(counter, internal_qr,external_qr))
+    cursor.execute(''' SELECT id, counter FROM identificadores WHERE internal_qr=%s AND external_qr=%s''',(internal_qr,external_qr))
+    results = cursor.fetchall()
+    
     mysql.connection.commit()
     cursor.close()
 
-    if(result == 0): 
+    if(results[0][0] == 0): 
         return jsonify(
-            match=False
+            match=False,
+            counter=results[0][1]
         )
     else: 
         return jsonify(
-            match=True
+            match=True,
+            counter=results[0][1]
         )
